@@ -1,5 +1,3 @@
-QBCore = nil
-
 local pedInSameVehicleLast=false
 local vehicle
 local lastVehicle
@@ -38,13 +36,6 @@ if cfg.randomTireBurstInterval ~= 0 then tireBurstLuckyNumber = math.random(tire
 
 local fixMessagePos = math.random(repairCfg.fixMessageCount)
 local noFixMessagePos = math.random(repairCfg.noFixMessageCount)
-
-Citizen.CreateThread(function()
-	while QBCore == nil do
-		TriggerEvent("QBCore:GetObject", function(obj) QBCore = obj end)   
-		Citizen.Wait(0)
-	end
-end)
 
 -- Display blips on map
 Citizen.CreateThread(function()

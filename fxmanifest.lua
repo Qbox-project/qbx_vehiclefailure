@@ -4,12 +4,10 @@ game 'gta5'
 description 'QB-VehicleFailure'
 version '1.0.0'
 
-client_scripts {
-	"config.lua",
-	"client.lua"
+shared_scripts { 
+	'@qb-core/import.lua',
+	'config.lua'
 }
 
-server_scripts {
-	"config.lua",
-	"server.lua"
-}
+client_script 'client.lua'
+server_script 'server.lua'
