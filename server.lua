@@ -24,7 +24,7 @@ QBCore.Functions.CreateUseableItem("advancedrepairkit", function(source, item)
     end
 end)
 
-RegisterServerEvent('qb-qb-vehiclefailure:removeItem')
+RegisterServerEvent('qb-vehiclefailure:removeItem')
 AddEventHandler('qb-qb-vehiclefailure:removeItem', function(item)
     local src = source
     local ply = QBCore.Functions.GetPlayer(src)
