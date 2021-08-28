@@ -55,7 +55,8 @@ end)
 RegisterNetEvent('qb-vehiclefailure:client:RepairVehicle')
 AddEventHandler('qb-vehiclefailure:client:RepairVehicle', function()
 	local vehicle = QBCore.Functions.GetClosestVehicle()
-	if vehicle ~= nil and vehicle ~= 0 then
+	local engineHealth = GetVehicleEngineHealth(vehicle) --This is to prevent people from "repairing" a vehicle and setting engine health lower than what the vehicles engine health was before repairing.
+	if vehicle ~= nil and vehicle ~= 0 and engineHealth < 500 then
 		local ped = PlayerPedId()
 		local pos = GetEntityCoords(ped)
 		local vehpos = GetEntityCoords(vehicle)
