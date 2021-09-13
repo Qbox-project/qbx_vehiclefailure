@@ -8,19 +8,16 @@ local fEngineDamageMult = 0.0
 local fBrakeForce = 1.0
 local isBrakingForward = false
 local isBrakingReverse = false
-
 local healthEngineLast = 1000.0
 local healthEngineCurrent = 1000.0
 local healthEngineNew = 1000.0
 local healthEngineDelta = 0.0
 local healthEngineDeltaScaled = 0.0
-
 local healthBodyLast = 1000.0
 local healthBodyCurrent = 1000.0
 local healthBodyNew = 1000.0
 local healthBodyDelta = 0.0
 local healthBodyDeltaScaled = 0.0
-
 local healthPetrolTankLast = 1000.0
 local healthPetrolTankCurrent = 1000.0
 local healthPetrolTankNew = 1000.0
@@ -686,4 +683,3 @@ function procent(time)
     until(TimeLeft == 100)
     showPro = false
 end
-
