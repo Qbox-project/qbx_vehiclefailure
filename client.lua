@@ -111,7 +111,7 @@ AddEventHandler('qb-vehiclefailure:client:CleanVehicle', function()
 		local pos = GetEntityCoords(ped)
 		local vehpos = GetEntityCoords(vehicle)
 		if #(pos - vehpos) < 3.0 and not IsPedInAnyVehicle(ped) then
-			CleanVehicle(vehicle)	
+			CleanVehicle(vehicle)
 		end
 	end
 end)
@@ -434,7 +434,7 @@ if cfg.torqueMultiplierEnabled or cfg.preventVehicleFlip or cfg.limpMode then
 								-- Forward and braking
 								isBrakingForward = true
 								brk = fscale(brake, 127.0, 254.0, 0.01, fBrakeForce, 10.0-(cfg.sundayDriverBrakeCurve*2.0))
-								--exports['qb-vehicletuning']:SetVehicleStatus(GetVehicleNumberPlateText(vehicle), "brakes", exports['qb-vehicletuning']:GetVehicleStatus(GetVehicleNumberPlateText(vehicle), "brakes") - 0.01)
+								--exports['qb-vehicletuning']:SetVehicleStatus(QBCore.Functions.GetPlate(vehicle), "brakes", exports['qb-vehicletuning']:GetVehicleStatus(QBCore.Functions.GetPlate(vehicle), "brakes") - 0.01)
 							end
 						elseif speed <= -1.0 then
 							-- Going reverse
@@ -442,7 +442,7 @@ if cfg.torqueMultiplierEnabled or cfg.preventVehicleFlip or cfg.limpMode then
 								-- Reversing and accelerating (using the brake)
 								local rev = fscale(brake, 127.0, 254.0, 0.1, 1.0, 10.0-(cfg.sundayDriverAcceleratorCurve*2.0))
 								factor = factor * rev
-								--exports['qb-vehicletuning']:SetVehicleStatus(GetVehicleNumberPlateText(vehicle), "brakes", exports['qb-vehicletuning']:GetVehicleStatus(GetVehicleNumberPlateText(vehicle), "brakes") - 0.01)
+								--exports['qb-vehicletuning']:SetVehicleStatus(QBCore.Functions.GetPlate(vehicle), "brakes", exports['qb-vehicletuning']:GetVehicleStatus(QBCore.Functions.GetPlate(vehicle), "brakes") - 0.01)
 							end
 							if accelerator > 127 then
 								-- Reversing and braking (Using the accelerator)
@@ -631,12 +631,12 @@ Citizen.CreateThread(function()
 					DamageRandomComponent()
 				end
 			end
-			if healthBodyNew ~= healthBodyCurrent then 
-				SetVehicleBodyHealth(vehicle, healthBodyNew) 
+			if healthBodyNew ~= healthBodyCurrent then
+				SetVehicleBodyHealth(vehicle, healthBodyNew)
 				local dmgFactr = (healthBodyCurrent - healthBodyNew)
 				DamageRandomComponent()
 			end
-			if healthPetrolTankNew ~= healthPetrolTankCurrent then 
+			if healthPetrolTankNew ~= healthPetrolTankCurrent then
 				SetVehiclePetrolTankHealth(vehicle, healthPetrolTankNew)
 			end
 
@@ -649,7 +649,7 @@ Citizen.CreateThread(function()
 		else
 			if pedInSameVehicleLast == true then
 				-- We just got out of the vehicle
-				lastVehicle = GetVehiclePedIsIn(ped, true)				
+				lastVehicle = GetVehiclePedIsIn(ped, true)
 				if cfg.deformationMultiplier ~= -1 then SetVehicleHandlingFloat(lastVehicle, 'CHandlingData', 'fDeformationDamageMult', fDeformationDamageMult) end -- Restore deformation multiplier
 				SetVehicleHandlingFloat(lastVehicle, 'CHandlingData', 'fBrakeForce', fBrakeForce)  -- Restore Brake Force multiplier
 				if cfg.weaponsDamageMultiplier ~= -1 then SetVehicleHandlingFloat(lastVehicle, 'CHandlingData', 'fWeaponDamageMult', cfg.weaponsDamageMultiplier) end	-- Since we are out of the vehicle, we should no longer compensate for bodyDamageFactor
@@ -671,7 +671,7 @@ function DamageRandomComponent()
 	local dmgFctr = math.random() + math.random(0, 2)
 	local randomComponent = DamageComponents[math.random(1, #DamageComponents)]
 	local randomDamage = (math.random() + math.random(0, 1)) * dmgFctr
-	--exports['qb-vehicletuning']:SetVehicleStatus(GetVehicleNumberPlateText(vehicle), randomComponent, exports['qb-vehicletuning']:GetVehicleStatus(GetVehicleNumberPlateText(vehicle), randomComponent) - randomDamage)
+	--exports['qb-vehicletuning']:SetVehicleStatus(QBCore.Functions.GetPlate(vehicle), randomComponent, exports['qb-vehicletuning']:GetVehicleStatus(QBCore.Functions.GetPlate(vehicle), randomComponent) - randomDamage)
 end
 
 function procent(time)
