@@ -35,7 +35,7 @@ local fixMessagePos = math.random(repairCfg.fixMessageCount)
 local noFixMessagePos = math.random(repairCfg.noFixMessageCount)
 
 -- Display blips on map
-Citizen.CreateThread(function()
+CreateThread(function()
 	if (cfg.displayBlips == true) then
 		for _, item in pairs(repairCfg.mechanics) do
 			item.blip = AddBlipForCoord(item.x, item.y, item.z)
@@ -49,8 +49,7 @@ Citizen.CreateThread(function()
 	end
 end)
 
-RegisterNetEvent('qb-vehiclefailure:client:RepairVehicle')
-AddEventHandler('qb-vehiclefailure:client:RepairVehicle', function()
+RegisterNetEvent('qb-vehiclefailure:client:RepairVehicle', function()
 	local vehicle = QBCore.Functions.GetClosestVehicle()
 	local engineHealth = GetVehicleEngineHealth(vehicle) --This is to prevent people from "repairing" a vehicle and setting engine health lower than what the vehicles engine health was before repairing.
 	if vehicle ~= nil and vehicle ~= 0 and engineHealth < 500 then
@@ -96,15 +95,13 @@ function CleanVehicle(vehicle)
 	end)
 end
 
-RegisterNetEvent('qb-vehiclefailure:client:SyncWash')
-AddEventHandler('qb-vehiclefailure:client:SyncWash', function(veh)
+RegisterNetEvent('qb-vehiclefailure:client:SyncWash', function(veh)
 	SetVehicleDirtLevel(veh, 0.1)
 	SetVehicleUndriveable(veh, false)
 	WashDecalsFromVehicle(veh, 1.0)
 end)
 
-RegisterNetEvent('qb-vehiclefailure:client:CleanVehicle')
-AddEventHandler('qb-vehiclefailure:client:CleanVehicle', function()
+RegisterNetEvent('qb-vehiclefailure:client:CleanVehicle', function()
 	local vehicle = QBCore.Functions.GetClosestVehicle()
 	if vehicle ~= nil and vehicle ~= 0 then
 		local ped = PlayerPedId()
@@ -116,8 +113,7 @@ AddEventHandler('qb-vehiclefailure:client:CleanVehicle', function()
 	end
 end)
 
-RegisterNetEvent('qb-vehiclefailure:client:RepairVehicleFull')
-AddEventHandler('qb-vehiclefailure:client:RepairVehicleFull', function()
+RegisterNetEvent('qb-vehiclefailure:client:RepairVehicleFull', function()
 	local vehicle = QBCore.Functions.GetClosestVehicle()
 	if vehicle ~= nil and vehicle ~= 0 then
 		local ped = PlayerPedId()
@@ -307,8 +303,6 @@ local function fscale(inputValue, originalMin, originalMax, newBegin, newEnd, cu
 	return rangedValue
 end
 
-
-
 local function tireBurstLottery()
 	local tireBurstNumber = math.random(tireBurstMaxNumber)
 	if tireBurstNumber == tireBurstLuckyNumber then
@@ -331,9 +325,9 @@ local function tireBurstLottery()
 	end
 end
 
-Citizen.CreateThread(function()
+CreateThread(function()
     while true do
-        Citizen.Wait(7)
+        Wait(7)
         local pos = GetEntityCoords(PlayerPedId(), true)
         if showPro then
             QBCore.Functions.DrawText3D(pos.x, pos.y, pos.z, TimeLeft .. '~g~%')
@@ -341,9 +335,7 @@ Citizen.CreateThread(function()
     end
 end)
 
-
-RegisterNetEvent('iens:repair')
-AddEventHandler('iens:repair', function()
+RegisterNetEvent('iens:repair', function()
 	if isPedDrivingAVehicle() then
 		local ped = PlayerPedId()
 		vehicle = GetVehiclePedIsIn(ped, false)
@@ -375,8 +367,7 @@ AddEventHandler('iens:repair', function()
 	end
 end)
 
-RegisterNetEvent('iens:repaira')
-AddEventHandler('iens:repaira', function()
+RegisterNetEvent('iens:repaira', function()
 	if isPedDrivingAVehicle() then
 		local ped = PlayerPedId()
 		vehicle = GetVehiclePedIsIn(ped, false)
@@ -395,22 +386,18 @@ AddEventHandler('iens:repaira', function()
 	end
 end)
 
-RegisterNetEvent('iens:besked')
-AddEventHandler('iens:besked', function()
-
-notification("~r~There is roadside assistance available call that via your phone!")
-
+RegisterNetEvent('iens:besked', function()
+	notification("~r~There is roadside assistance available call that via your phone!")
 end)
 
-RegisterNetEvent('iens:notAllowed')
-AddEventHandler('iens:notAllowed', function()
+RegisterNetEvent('iens:notAllowed', function()
 	notification("~r~You don't have permission to repair vehicles")
 end)
 
 if cfg.torqueMultiplierEnabled or cfg.preventVehicleFlip or cfg.limpMode then
-	Citizen.CreateThread(function()
+	CreateThread(function()
 		while true do
-			Citizen.Wait(0)
+			Wait(0)
 			if cfg.torqueMultiplierEnabled or cfg.sundayDriver or cfg.limpMode then
 				if pedInSameVehicleLast then
 					local factor = 1.0
@@ -496,9 +483,9 @@ if cfg.torqueMultiplierEnabled or cfg.preventVehicleFlip or cfg.limpMode then
 	end)
 end
 
-Citizen.CreateThread(function()
+CreateThread(function()
 	while true do
-		Citizen.Wait(50)
+		Wait(50)
 		local ped = PlayerPedId()
 		if isPedDrivingAVehicle() then
 			vehicle = GetVehiclePedIsIn(ped, false)
@@ -660,6 +647,7 @@ Citizen.CreateThread(function()
 		end
 	end
 end)
+
 local DamageComponents = {
     "radiator",
     "axle",
@@ -679,7 +667,7 @@ function procent(time)
     TimeLeft = 0
     repeat
         TimeLeft = TimeLeft + 1
-        Citizen.Wait(time)
+        Wait(time)
     until(TimeLeft == 100)
     showPro = false
 end
