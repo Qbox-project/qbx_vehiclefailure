@@ -72,6 +72,15 @@ local function CleanVehicle(vehicle)
 	end)
 end
 
+local function IsBackEngine(vehModel)
+    for _, model in pairs(BackEngineVehicles) do
+        if GetHashKey(model) == vehModel then
+            return true
+        end
+    end
+    return false
+end
+
 local function RepairVehicleFull(vehicle)
 	if (IsBackEngine(GetEntityModel(vehicle))) then
         SetVehicleDoorOpen(vehicle, 5, false, false)
@@ -154,15 +163,6 @@ local function RepairVehicle(vehicle)
 			SetVehicleDoorShut(vehicle, 4, false)
 		end
 	end)
-end
-
-local function IsBackEngine(vehModel)
-    for _, model in pairs(BackEngineVehicles) do
-        if GetHashKey(model) == vehModel then
-            return true
-        end
-    end
-    return false
 end
 
 local function notification(msg)
