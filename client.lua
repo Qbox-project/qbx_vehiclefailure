@@ -283,8 +283,20 @@ RegisterNetEvent('qb-vehiclefailure:client:RepairVehicle', function()
 			else
 				ShowEnginePos = true
 			end
+    else
+      if #(pos - vehpos) > 4.9 then
+        QBCore.Functions.Notify("You are too far from the vehicle!", "error")
+      else
+        QBCore.Functions.Notify("You cannot repair a vehicle engine from the inside!", "error")
+      end
 		end
-	end
+  else
+    if vehicle == nil or vehicle == 0 then
+      QBCore.Functions.Notify("You are not near a vehicle!", "error")
+    else
+      QBCore.Functions.Notify("Vehicle is too healthy and needs better tools!", "error")
+    end
+  end
 end)
 
 RegisterNetEvent('qb-vehiclefailure:client:SyncWash', function(veh)
@@ -321,7 +333,15 @@ RegisterNetEvent('qb-vehiclefailure:client:RepairVehicleFull', function()
 			else
 				ShowEnginePos = true
 			end
+    else
+      if #(pos - vehpos) > 4.9 then
+        QBCore.Functions.Notify("You are too far from the vehicle!", "error")
+      else
+        QBCore.Functions.Notify("You cannot repair a vehicle engine from the inside!", "error")
+      end
 		end
+  else
+    QBCore.Functions.Notify("You are not near a vehicle!", "error")
 	end
 end)
 
