@@ -1,5 +1,4 @@
 local QBCore = exports['qb-core']:GetCoreObject()
-
 QBCore.Commands.Add("fix", "Repair your vehicle (Admin Only)", {}, false, function(source)
     TriggerClientEvent('iens:repaira', source)
     TriggerClientEvent('vehiclemod:client:fixEverything', source)
