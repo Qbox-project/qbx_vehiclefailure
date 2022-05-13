@@ -58,7 +58,7 @@ local function CleanVehicle(veh)
 	}, {}, {}, {}, function() -- Done
 		QBCore.Functions.Notify(Lang:t("success.cleaned_veh"))
 		SetVehicleDirtLevel(veh, 0.1)
-        SetVehicleUndriveable(veh, false)
+		SetVehicleUndriveable(veh, false)
 		WashDecalsFromVehicle(veh, 1.0)
 		TriggerServerEvent('qb-vehiclefailure:server:removewashingkit', veh)
 		TriggerEvent('inventory:client:ItemBox', QBCore.Shared.Items["cleaningkit"], "remove")
