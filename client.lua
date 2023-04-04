@@ -1,4 +1,4 @@
-local QBCore = exports['qb-core']:GetCoreObject()
+local QBCore = exports['qbx-core']:GetCoreObject()
 local pedInSameVehicleLast=false
 local vehicle
 local lastVehicle
@@ -44,7 +44,7 @@ local function DamageRandomComponent()
 	local dmgFctr = math.random() + math.random(0, 2)
 	local randomComponent = DamageComponents[math.random(1, #DamageComponents)]
 	local randomDamage = (math.random() + math.random(0, 1)) * dmgFctr
-	exports['qb-mechanicjob']:SetVehicleStatus(QBCore.Functions.GetPlate(vehicle), randomComponent, exports['qb-mechanicjob']:GetVehicleStatus(QBCore.Functions.GetPlate(vehicle), randomComponent) - randomDamage)
+	exports['qbx-mechanicjob']:SetVehicleStatus(QBCore.Functions.GetPlate(vehicle), randomComponent, exports['qbx-mechanicjob']:GetVehicleStatus(QBCore.Functions.GetPlate(vehicle), randomComponent) - randomDamage)
 end
 
 local function CleanVehicle(veh)
