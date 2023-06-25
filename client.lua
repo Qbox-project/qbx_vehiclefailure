@@ -32,9 +32,17 @@ local DamageComponents = {
     "radiator",
     "axle",
     "clutch",
-	"fuel",
-	"brakes",
+    "fuel",
+    "brakes",
 }
+
+lib.onCache('vehicle', function(value)
+    cache.vehicle = value
+end)
+
+lib.onCache('seat', function(value)
+    cache.seat = value
+end)
 
 -- Functions
 
