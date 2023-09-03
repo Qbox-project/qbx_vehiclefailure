@@ -475,7 +475,7 @@ CreateThread(function()
 		Wait(50)
 		local ped = cache.ped
 		if isPedDrivingAVehicle() then
-			vehicle = GetVehiclePedIsIn(ped, false)
+			vehicle = cache.vehicle
 			vehicleClass = GetVehicleClass(vehicle)
 			healthEngineCurrent = GetVehicleEngineHealth(vehicle)
 			if healthEngineCurrent == 1000 then healthEngineLast = 1000.0 end
