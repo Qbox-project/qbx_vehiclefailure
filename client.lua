@@ -313,15 +313,16 @@ RegisterNetEvent('iens:repaira', function()
 		QBCore.Functions.Notify(Lang:t("error.inside_veh_req"))
 		return
 	end
-	SetVehicleDirtLevel(cache.vehicle)
-	SetVehicleUndriveable(cache.vehicle, false)
-	WashDecalsFromVehicle(cache.vehicle, 1.0)
+	vehicle = cache.vehicle
+	SetVehicleDirtLevel(vehicle)
+	SetVehicleUndriveable(vehicle, false)
+	WashDecalsFromVehicle(vehicle, 1.0)
 	QBCore.Functions.Notify(Lang:t("success.repaired_veh"))
-	SetVehicleFixed(cache.vehicle)
+	SetVehicleFixed(vehicle)
 	healthBodyLast = 1000.0
 	healthEngineLast = 1000.0
 	healthPetrolTankLast = 1000.0
-	SetVehicleEngineOn(cache.vehicle, true, false)
+	SetVehicleEngineOn(vehicle, true, false)
 end)
 
 RegisterNetEvent('iens:besked', function()
@@ -337,25 +338,26 @@ RegisterNetEvent('iens:repair', function()
 		QBCore.Functions.Notify(Lang:t("error.inside_veh_req"))
 		return
 	end
+	vehicle = cache.vehicle
 	if isNearMechanic() then return end
-	if GetVehicleEngineHealth(cache.vehicle) >= cfg.cascadingFailureThreshold + 5 then
+	if GetVehicleEngineHealth(vehicle) >= cfg.cascadingFailureThreshold + 5 then
 		QBCore.Functions.Notify(Lang:t(('nofix_message_%s'):format(noFixMessagePos)))
 		noFixMessagePos += 1
 		if noFixMessagePos > repairCfg.noFixMessageCount then noFixMessagePos = 1 end
 		return
 	end
-	if GetVehicleOilLevel(cache.vehicle) <= 0 then
+	if GetVehicleOilLevel(vehicle) <= 0 then
 		QBCore.Functions.Notify(Lang:t("error.veh_damaged"))
 		return
 	end
 	
-	SetVehicleUndriveable(cache.vehicle, false)
-	SetVehicleEngineHealth(cache.vehicle, cfg.cascadingFailureThreshold + 5)
-	SetVehiclePetrolTankHealth(cache.vehicle, 750.0)
+	SetVehicleUndriveable(vehicle, false)
+	SetVehicleEngineHealth(vehicle, cfg.cascadingFailureThreshold + 5)
+	SetVehiclePetrolTankHealth(vehicle, 750.0)
 	healthEngineLast = cfg.cascadingFailureThreshold + 5
 	healthPetrolTankLast = 750.0
-	SetVehicleEngineOn(cache.vehicle, true, false )
-	SetVehicleOilLevel(cache.vehicle,(GetVehicleOilLevel(cache.vehicle) / 3) - 0.5)
+	SetVehicleEngineOn(vehicle, true, false )
+	SetVehicleOilLevel(vehicle, (GetVehicleOilLevel(vehicle) / 3) - 0.5)
 	QBCore.Functions.Notify(Lang:t(('fix_message_%s'):format(fixMessagePos)))
 	fixMessagePos += 1
 	if fixMessagePos > repairCfg.fixMessageCount then fixMessagePos = 1 end
@@ -478,22 +480,23 @@ CreateThread(function()
 	while true do
 		Wait(50)
 		if isPedDrivingAVehicle() then
-			vehicleClass = GetVehicleClass(cache.vehicle)
-			healthEngineCurrent = GetVehicleEngineHealth(cache.vehicle)
+			vehicle = cache.vehicle
+			vehicleClass = GetVehicleClass(vehicle)
+			healthEngineCurrent = GetVehicleEngineHealth(vehicle)
 			if healthEngineCurrent == 1000 then healthEngineLast = 1000.0 end
 			healthEngineNew = healthEngineCurrent
 			healthEngineDelta = healthEngineLast - healthEngineCurrent
 			healthEngineDeltaScaled = healthEngineDelta * cfg.damageFactorEngine * cfg.classDamageMultiplier[vehicleClass]
 
-			healthBodyCurrent = GetVehicleBodyHealth(cache.vehicle)
+			healthBodyCurrent = GetVehicleBodyHealth(vehicle)
 			if healthBodyCurrent == 1000 then healthBodyLast = 1000.0 end
 			healthBodyNew = healthBodyCurrent
 			healthBodyDelta = healthBodyLast - healthBodyCurrent
 			healthBodyDeltaScaled = healthBodyDelta * cfg.damageFactorBody * cfg.classDamageMultiplier[vehicleClass]
 
-			healthPetrolTankCurrent = GetVehiclePetrolTankHealth(cache.vehicle)
+			healthPetrolTankCurrent = GetVehiclePetrolTankHealth(vehicle)
 			if cfg.compatibilityMode and healthPetrolTankCurrent < 1 then
-				--	SetVehiclePetrolTankHealth(cache.vehicle, healthPetrolTankLast)
+				--	SetVehiclePetrolTankHealth(vehicle, healthPetrolTankLast)
 				--	healthPetrolTankCurrent = healthPetrolTankLast
 				healthPetrolTankLast = healthPetrolTankCurrent
 			end
@@ -503,17 +506,17 @@ CreateThread(function()
 			healthPetrolTankDeltaScaled = healthPetrolTankDelta * cfg.damageFactorPetrolTank * cfg.classDamageMultiplier[vehicleClass]
 
 			if healthEngineCurrent > cfg.engineSafeGuard + 1 then
-				SetVehicleUndriveable(cache.vehicle,false)
+				SetVehicleUndriveable(vehicle,false)
 			end
 
 			if healthEngineCurrent <= cfg.engineSafeGuard + 1 and cfg.limpMode == false then
-				local vehpos = GetEntityCoords(cache.vehicle)
-				StartParticleFxLoopedAtCoord("ent_ray_heli_aprtmnt_l_fire", vehpos.x, vehpos.y, vehpos.z-0.7, 0.0, 0.0, 0.0, 1.0, false, false, false, false)
-				SetVehicleUndriveable(cache.vehicle,true)
+				local vehpos = GetEntityCoords(vehicle)
+				StartParticleFxLoopedAtCoord("ent_ray_heli_aprtmnt_l_fire", vehpos.x, vehpos.y, vehpos.z - 0.7, 0.0, 0.0, 0.0, 1.0, false, false, false, false)
+				SetVehicleUndriveable(vehicle, true)
 			end
 
 			-- If ped spawned a new vehicle while in a vehicle or teleported from one vehicle to another, handle as if we just entered the car
-			if cache.vehicle ~= lastVehicle then
+			if vehicle ~= lastVehicle then
 				pedInSameVehicleLast = false
 			end
 
@@ -574,23 +577,23 @@ CreateThread(function()
 			else
 				-- Just got in the vehicle. Damage can not be multiplied this round
 				-- Set vehicle handling data
-				fDeformationDamageMult = GetVehicleHandlingFloat(cache.vehicle, 'CHandlingData', 'fDeformationDamageMult')
-				fBrakeForce = GetVehicleHandlingFloat(cache.vehicle, 'CHandlingData', 'fBrakeForce')
+				fDeformationDamageMult = GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fDeformationDamageMult')
+				fBrakeForce = GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fBrakeForce')
 				local newFDeformationDamageMult = fDeformationDamageMult ^ cfg.deformationExponent	-- Pull the handling file value closer to 1
-				if cfg.deformationMultiplier ~= -1 then SetVehicleHandlingFloat(cache.vehicle, 'CHandlingData', 'fDeformationDamageMult', newFDeformationDamageMult * cfg.deformationMultiplier) end  -- Multiply by our factor
-				if cfg.weaponsDamageMultiplier ~= -1 then SetVehicleHandlingFloat(cache.vehicle, 'CHandlingData', 'fWeaponDamageMult', cfg.weaponsDamageMultiplier / cfg.damageFactorBody) end -- Set weaponsDamageMultiplier and compensate for damageFactorBody
+				if cfg.deformationMultiplier ~= -1 then SetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fDeformationDamageMult', newFDeformationDamageMult * cfg.deformationMultiplier) end  -- Multiply by our factor
+				if cfg.weaponsDamageMultiplier ~= -1 then SetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fWeaponDamageMult', cfg.weaponsDamageMultiplier / cfg.damageFactorBody) end -- Set weaponsDamageMultiplier and compensate for damageFactorBody
 
 				--Get the CollisionDamageMultiplier
-				fCollisionDamageMult = GetVehicleHandlingFloat(cache.vehicle, 'CHandlingData', 'fCollisionDamageMult')
+				fCollisionDamageMult = GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fCollisionDamageMult')
 				--Modify it by pulling all number a towards 1.0
 				local newFCollisionDamageMultiplier = fCollisionDamageMult ^ cfg.collisionDamageExponent	-- Pull the handling file value closer to 1
-				SetVehicleHandlingFloat(cache.vehicle, 'CHandlingData', 'fCollisionDamageMult', newFCollisionDamageMultiplier)
+				SetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fCollisionDamageMult', newFCollisionDamageMultiplier)
 
 				--Get the EngineDamageMultiplier
-				fEngineDamageMult = GetVehicleHandlingFloat(cache.vehicle, 'CHandlingData', 'fEngineDamageMult')
+				fEngineDamageMult = GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fEngineDamageMult')
 				--Modify it by pulling all number a towards 1.0
 				local newFEngineDamageMult = fEngineDamageMult ^ cfg.engineDamageExponent	-- Pull the handling file value closer to 1
-				SetVehicleHandlingFloat(cache.vehicle, 'CHandlingData', 'fEngineDamageMult', newFEngineDamageMult)
+				SetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fEngineDamageMult', newFEngineDamageMult)
 
 				-- If body damage catastrophic, reset somewhat so we can get new damage to multiply
 				if healthBodyCurrent < cfg.cascadingFailureThreshold then
@@ -601,26 +604,26 @@ CreateThread(function()
 
 			-- set the actual new values
 			if healthEngineNew ~= healthEngineCurrent then
-				SetVehicleEngineHealth(cache.vehicle, healthEngineNew)
+				SetVehicleEngineHealth(vehicle, healthEngineNew)
 				local dmgFactr = (healthEngineCurrent - healthEngineNew)
 				if dmgFactr > 0.8 then
 					damageRandomComponent()
 				end
 			end
 			if healthBodyNew ~= healthBodyCurrent then
-				SetVehicleBodyHealth(cache.vehicle, healthBodyNew)
+				SetVehicleBodyHealth(vehicle, healthBodyNew)
 				damageRandomComponent()
 			end
 			if healthPetrolTankNew ~= healthPetrolTankCurrent then
-				SetVehiclePetrolTankHealth(cache.vehicle, healthPetrolTankNew)
+				SetVehiclePetrolTankHealth(vehicle, healthPetrolTankNew)
 			end
 
 			-- Store current values, so we can calculate delta next time around
 			healthEngineLast = healthEngineNew
 			healthBodyLast = healthBodyNew
 			healthPetrolTankLast = healthPetrolTankNew
-			lastVehicle = cache.vehicle
-			if cfg.randomTireBurstInterval ~= 0 and GetEntitySpeed(cache.vehicle) > 10 then tireBurstLottery() end
+			lastVehicle = vehicle
+			if cfg.randomTireBurstInterval ~= 0 and GetEntitySpeed(vehicle) > 10 then tireBurstLottery() end
 		else
 			if pedInSameVehicleLast == true then
 				-- We just got out of the vehicle
