@@ -340,7 +340,7 @@ RegisterNetEvent('iens:repair', function()
 	if isNearMechanic() then return end
 	if GetVehicleEngineHealth(cache.vehicle) >= cfg.cascadingFailureThreshold + 5 then
 		QBCore.Functions.Notify(Lang:t(('nofix_message_%s'):format(noFixMessagePos)))
-		noFixMessagePos = noFixMessagePos + 1
+		noFixMessagePos += 1
 		if noFixMessagePos > repairCfg.noFixMessageCount then noFixMessagePos = 1 end
 		return
 	end
@@ -357,7 +357,7 @@ RegisterNetEvent('iens:repair', function()
 	SetVehicleEngineOn(cache.vehicle, true, false )
 	SetVehicleOilLevel(cache.vehicle,(GetVehicleOilLevel(cache.vehicle) / 3) - 0.5)
 	QBCore.Functions.Notify(Lang:t(('fix_message_%s'):format(fixMessagePos)))
-	fixMessagePos = fixMessagePos + 1
+	fixMessagePos += 1
 	if fixMessagePos > repairCfg.fixMessageCount then fixMessagePos = 1 end
 end)
 
