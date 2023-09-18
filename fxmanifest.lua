@@ -1,7 +1,9 @@
 fx_version 'cerulean'
 game 'gta5'
 
-description 'https://github.com/Qbox-project/qbx-vehiclefailure'
+description 'Vehiclefailure for Qbox'
+repository 'https://github.com/Qbox-project/qbx-vehiclefailure'
+
 version '1.0.0'
 
 shared_scripts {
