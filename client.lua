@@ -1,5 +1,4 @@
-local QBCore = exports['qbx-core']:GetCoreObject()
-local pedInSameVehicleLast=false
+local pedInSameVehicleLast = false
 local vehicle
 local lastVehicle
 local vehicleClass
@@ -27,7 +26,6 @@ local healthPetrolTankDeltaScaled = 0.0
 local fixMessagePos = math.random(repairCfg.fixMessageCount)
 local noFixMessagePos = math.random(repairCfg.noFixMessageCount)
 local tireBurstMaxNumber = cfg.randomTireBurstInterval * 1200;
-
 local DamageComponents = {
     "radiator",
     "axle",
@@ -42,33 +40,38 @@ local function damageRandomComponent()
 	local dmgFctr = math.random() + math.random(0, 2)
 	local randomComponent = DamageComponents[math.random(1, #DamageComponents)]
 	local randomDamage = (math.random() + math.random(0, 1)) * dmgFctr
-	exports['qbx-mechanicjob']:SetVehicleStatus(QBCore.Functions.GetPlate(vehicle), randomComponent, exports['qbx-mechanicjob']:GetVehicleStatus(QBCore.Functions.GetPlate(vehicle), randomComponent) - randomDamage)
+	exports['qbx-mechanicjob']:SetVehicleStatus(GetPlate(vehicle), randomComponent, exports['qbx-mechanicjob']:GetVehicleStatus(GetPlate(vehicle), randomComponent) - randomDamage)
 end
 
 ---cleans vehicle with animation and progress bar. Consumes a cleaning kit.
 ---@param veh number
 local function cleanVehicle(veh)
-	local ped = cache.ped
-	TaskStartScenarioInPlace(ped, "WORLD_HUMAN_MAID_CLEAN", 0, true)
-	QBCore.Functions.Progressbar("cleaning_vehicle", Lang:t("progress.clean_veh"), math.random(10000, 20000), false, true, {
-		disableMovement = true,
-		disableCarMovement = true,
-		disableMouse = false,
-		disableCombat = true,
-	}, {}, {}, {}, function() -- Done
+	TaskStartScenarioInPlace(cache.ped, "WORLD_HUMAN_MAID_CLEAN", 0, true)
+	if lib.progressBar({
+		duration = math.random(10000, 20000),
+		label = Lang:t('progress.clean_veh'),
+		useWhileDead = false,
+		canCancel = true,
+		disable = {
+			move = true,
+			car = true,
+			mouse = false,
+			combat = true
+		}
+	}) then -- if completed
 		QBCore.Functions.Notify(Lang:t("success.cleaned_veh"))
 		SetVehicleDirtLevel(veh, 0.1)
 		SetVehicleUndriveable(veh, false)
 		WashDecalsFromVehicle(veh, 1.0)
 		TriggerServerEvent('qb-vehiclefailure:server:removewashingkit', veh)
 		TriggerEvent('inventory:client:ItemBox', QBCore.Shared.Items["cleaningkit"], "remove")
-		ClearAllPedProps(ped)
-		ClearPedTasks(ped)
-	end, function() -- Cancel
+		ClearAllPedProps(cache.ped)
+		ClearPedTasks(cache.ped)
+	else -- if canceled
 		QBCore.Functions.Notify(Lang:t("error.failed_notification"), "error")
-		ClearAllPedProps(ped)
-		ClearPedTasks(ped)
-	end)
+		ClearAllPedProps(cache.ped)
+		ClearPedTasks(cache.ped)
+	end
 end
 
 ---@param vehModel number
@@ -101,18 +104,23 @@ end
 ---@param timeUpperBound integer
 local function repairVehicle(veh, engineHealth, itemName, timeLowerBound, timeUpperBound)
 	openVehicleDoors(veh)
-	
-	QBCore.Functions.Progressbar("repair_vehicle", Lang:t("progress.repair_veh"), math.random(timeLowerBound, timeUpperBound), false, true, {
-		disableMovement = true,
-		disableCarMovement = true,
-		disableMouse = false,
-		disableCombat = true,
-	}, {
-		animDict = "mini@repair",
-		anim = "fixing_a_player",
-		flags = 16,
-	}, {}, {}, function() -- Done
-		StopAnimTask(cache.ped, "mini@repair", "fixing_a_player", 1.0)
+	if lib.progressBar({
+		duration = math.random(timeLowerBound, timeUpperBound),
+		label = Lang:t('progress.repair_veh'),
+		useWhileDead = false,
+		canCancel = true,
+		disable = {
+			move = true,
+			car = true,
+			mouse = false,
+			combat = true
+		},
+		anim = {
+			dict = 'mini@repair',
+			clip = 'fixing_a_player',
+			flag = 16
+		}
+	}) then -- if completed
 		QBCore.Functions.Notify(Lang:t("success.repaired_veh"))
 		SetVehicleEngineHealth(veh, engineHealth)
 		SetVehicleEngineOn(veh, true, false)
@@ -123,11 +131,10 @@ local function repairVehicle(veh, engineHealth, itemName, timeLowerBound, timeUp
 		SetVehicleTyreFixed(veh, 4)
 		closeVehicleDoors(veh)
 		TriggerServerEvent('qb-vehiclefailure:removeItem', itemName)
-	end, function() -- Cancel
-		StopAnimTask(cache.ped, "mini@repair", "fixing_a_player", 1.0)
+	else -- if canceled
 		QBCore.Functions.Notify(Lang:t("error.failed_notification"), "error")
 		closeVehicleDoors(veh)
-	end)
+	end
 end
 
 ---repairs vehicle with progress bar and animation, consuming an advanced repair kit.
@@ -159,8 +166,7 @@ end
 
 ---@return boolean?
 local function isNearMechanic()
-	local ped = cache.ped
-	local pedLocation = GetEntityCoords(ped, 0)
+	local pedLocation = GetEntityCoords(cache.ped, 0)
 	for _, item in pairs(repairCfg.mechanics) do
 		local distance = #(vector3(item.x, item.y, item.z) - pedLocation)
 		if distance <= item.r then
@@ -232,12 +238,12 @@ local function tireBurstLottery()
 	local numWheels = GetVehicleNumberOfWheels(vehicle)
 	local affectedTire
 	if numWheels == 2 then
-		affectedTire = (math.random(2)-1)*4		-- wheel 0 or 4
+		affectedTire = (math.random(2) - 1) * 4		-- wheel 0 or 4
 	elseif numWheels == 4 then
-		affectedTire = (math.random(4)-1)
+		affectedTire = (math.random(4) - 1)
 		if affectedTire > 1 then affectedTire = affectedTire + 2 end	-- 0, 1, 4, 5
 	elseif numWheels == 6 then
-		affectedTire = (math.random(6)-1)
+		affectedTire = (math.random(6) - 1)
 	else
 		affectedTire = 0
 	end
@@ -313,10 +319,10 @@ RegisterNetEvent('iens:repaira', function()
 	WashDecalsFromVehicle(vehicle, 1.0)
 	QBCore.Functions.Notify(Lang:t("success.repaired_veh"))
 	SetVehicleFixed(vehicle)
-	healthBodyLast=1000.0
-	healthEngineLast=1000.0
-	healthPetrolTankLast=1000.0
-	SetVehicleEngineOn(vehicle, true, false )
+	healthBodyLast = 1000.0
+	healthEngineLast = 1000.0
+	healthPetrolTankLast = 1000.0
+	SetVehicleEngineOn(vehicle, true, false)
 end)
 
 RegisterNetEvent('iens:besked', function()
@@ -345,13 +351,13 @@ RegisterNetEvent('iens:repair', function()
 		return
 	end
 	
-	SetVehicleUndriveable(vehicle,false)
+	SetVehicleUndriveable(vehicle, false)
 	SetVehicleEngineHealth(vehicle, cfg.cascadingFailureThreshold + 5)
 	SetVehiclePetrolTankHealth(vehicle, 750.0)
-	healthEngineLast=cfg.cascadingFailureThreshold +5
-	healthPetrolTankLast=750.0
+	healthEngineLast = cfg.cascadingFailureThreshold + 5
+	healthPetrolTankLast = 750.0
 	SetVehicleEngineOn(vehicle, true, false )
-	SetVehicleOilLevel(vehicle,(GetVehicleOilLevel(vehicle)/3)-0.5)
+	SetVehicleOilLevel(vehicle, (GetVehicleOilLevel(vehicle) / 3) - 0.5)
 	QBCore.Functions.Notify(Lang:t(('fix_message_%s'):format(fixMessagePos)))
 	fixMessagePos += 1
 	if fixMessagePos > repairCfg.fixMessageCount then fixMessagePos = 1 end
@@ -376,19 +382,19 @@ end
 local function preventVehicleFlip()
 	local roll = GetEntityRoll(vehicle)
 	if (roll > 75.0 or roll < -75.0) and GetEntitySpeed(vehicle) < 2 then
-		DisableControlAction(2,59,true) -- Disable left/right
-		DisableControlAction(2,60,true) -- Disable up/down
+		DisableControlAction(2, 59, true) -- Disable left/right
+		DisableControlAction(2, 60, true) -- Disable up/down
 	end
 end
 
 local function setVehicleEngineTorqueMultiplier()
 	local factor = 1.0
 	if cfg.torqueMultiplierEnabled and healthEngineNew < 900 then
-		factor = (healthEngineNew+200.0) / 1100
+		factor = (healthEngineNew + 200.0) / 1100
 	end
 	if cfg.sundayDriver and GetVehicleClass(vehicle) ~= 14 then -- Not for boats
-		local accelerator = GetControlValue(2,71)
-		local brake = GetControlValue(2,72)
+		local accelerator = GetControlValue(2, 71)
+		local brake = GetControlValue(2, 72)
 		local speed = GetEntitySpeedVector(vehicle, true)['y']
 		-- Change Braking force
 		local brk = fBrakeForce
@@ -396,27 +402,27 @@ local function setVehicleEngineTorqueMultiplier()
 			-- Going forward
 			if accelerator > 127 then
 				-- Forward and accelerating
-				local acc = fscale(accelerator, 127.0, 254.0, 0.1, 1.0, 10.0-(cfg.sundayDriverAcceleratorCurve*2.0))
+				local acc = fscale(accelerator, 127.0, 254.0, 0.1, 1.0, 10.0 - (cfg.sundayDriverAcceleratorCurve * 2.0))
 				factor = factor * acc
 			end
 			if brake > 127 then
 				-- Forward and braking
 				isBrakingForward = true
-				brk = fscale(brake, 127.0, 254.0, 0.01, fBrakeForce, 10.0-(cfg.sundayDriverBrakeCurve*2.0))
+				brk = fscale(brake, 127.0, 254.0, 0.01, fBrakeForce, 10.0 - (cfg.sundayDriverBrakeCurve * 2.0))
 				--exports['qb-vehicletuning']:SetVehicleStatus(QBCore.Functions.GetPlate(vehicle), "brakes", exports['qb-vehicletuning']:GetVehicleStatus(QBCore.Functions.GetPlate(vehicle), "brakes") - 0.01)
 			end
 		elseif speed <= -1.0 then
 			-- Going reverse
 			if brake > 127 then
 				-- Reversing and accelerating (using the brake)
-				local rev = fscale(brake, 127.0, 254.0, 0.1, 1.0, 10.0-(cfg.sundayDriverAcceleratorCurve*2.0))
+				local rev = fscale(brake, 127.0, 254.0, 0.1, 1.0, 10.0 - (cfg.sundayDriverAcceleratorCurve * 2.0))
 				factor = factor * rev
 				--exports['qb-vehicletuning']:SetVehicleStatus(QBCore.Functions.GetPlate(vehicle), "brakes", exports['qb-vehicletuning']:GetVehicleStatus(QBCore.Functions.GetPlate(vehicle), "brakes") - 0.01)
 			end
 			if accelerator > 127 then
 				-- Reversing and braking (Using the accelerator)
 				isBrakingReverse = true
-				brk = fscale(accelerator, 127.0, 254.0, 0.01, fBrakeForce, 10.0-(cfg.sundayDriverBrakeCurve*2.0))
+				brk = fscale(accelerator, 127.0, 254.0, 0.01, fBrakeForce, 10.0 - (cfg.sundayDriverBrakeCurve * 2.0))
 			end
 		else
 			-- Stopped or almost stopped or sliding sideways
@@ -425,23 +431,23 @@ local function setVehicleEngineTorqueMultiplier()
 				-- Not sliding sideways
 				if isBrakingForward == true then
 					--Stopped or going slightly forward while braking
-					DisableControlAction(2,72,true) -- Disable Brake until user lets go of brake
-					SetVehicleForwardSpeed(vehicle,speed*0.98)
-					SetVehicleBrakeLights(vehicle,true)
+					DisableControlAction(2, 72, true) -- Disable Brake until user lets go of brake
+					SetVehicleForwardSpeed(vehicle, speed * 0.98)
+					SetVehicleBrakeLights(vehicle, true)
 				end
 				if isBrakingReverse == true then
 					--Stopped or going slightly in reverse while braking
-					DisableControlAction(2,71,true) -- Disable reverse Brake until user lets go of reverse brake (Accelerator)
-					SetVehicleForwardSpeed(vehicle,speed*0.98)
-					SetVehicleBrakeLights(vehicle,true)
+					DisableControlAction(2, 71, true) -- Disable reverse Brake until user lets go of reverse brake (Accelerator)
+					SetVehicleForwardSpeed(vehicle, speed * 0.98)
+					SetVehicleBrakeLights(vehicle, true)
 				end
-				if isBrakingForward == true and GetDisabledControlNormal(2,72) == 0 then
+				if isBrakingForward == true and GetDisabledControlNormal(2, 72) == 0 then
 					-- We let go of the brake
-					isBrakingForward=false
+					isBrakingForward = false
 				end
-				if isBrakingReverse == true and GetDisabledControlNormal(2,71) == 0 then
+				if isBrakingReverse == true and GetDisabledControlNormal(2, 71) == 0 then
 					-- We let go of the reverse brake (Accelerator)
-					isBrakingReverse=false
+					isBrakingReverse = false
 				end
 			end
 		end
@@ -473,8 +479,7 @@ end
 CreateThread(function()
 	while true do
 		Wait(50)
-		local ped = cache.ped
-		if isPedDrivingAVehicle() then
+		if cache.seat == -1 then
 			vehicle = cache.vehicle
 			vehicleClass = GetVehicleClass(vehicle)
 			healthEngineCurrent = GetVehicleEngineHealth(vehicle)
@@ -500,14 +505,14 @@ CreateThread(function()
 			healthPetrolTankDelta = healthPetrolTankLast-healthPetrolTankCurrent
 			healthPetrolTankDeltaScaled = healthPetrolTankDelta * cfg.damageFactorPetrolTank * cfg.classDamageMultiplier[vehicleClass]
 
-			if healthEngineCurrent > cfg.engineSafeGuard+1 then
+			if healthEngineCurrent > cfg.engineSafeGuard + 1 then
 				SetVehicleUndriveable(vehicle,false)
 			end
 
-			if healthEngineCurrent <= cfg.engineSafeGuard+1 and cfg.limpMode == false then
+			if healthEngineCurrent <= cfg.engineSafeGuard + 1 and cfg.limpMode == false then
 				local vehpos = GetEntityCoords(vehicle)
-				StartParticleFxLoopedAtCoord("ent_ray_heli_aprtmnt_l_fire", vehpos.x, vehpos.y, vehpos.z-0.7, 0.0, 0.0, 0.0, 1.0, false, false, false, false)
-				SetVehicleUndriveable(vehicle,true)
+				StartParticleFxLoopedAtCoord("ent_ray_heli_aprtmnt_l_fire", vehpos.x, vehpos.y, vehpos.z - 0.7, 0.0, 0.0, 0.0, 1.0, false, false, false, false)
+				SetVehicleUndriveable(vehicle, true)
 			end
 
 			-- If ped spawned a new vehicle while in a vehicle or teleported from one vehicle to another, handle as if we just entered the car
@@ -546,12 +551,12 @@ CreateThread(function()
 					-- If somewhat damaged, slowly degrade until slightly before cascading failure sets in, then stop
 
 					if healthEngineNew > (cfg.cascadingFailureThreshold + 5) and healthEngineNew < cfg.degradingFailureThreshold then
-						healthEngineNew = healthEngineNew-(0.038 * cfg.degradingHealthSpeedFactor)
+						healthEngineNew = healthEngineNew - (0.038 * cfg.degradingHealthSpeedFactor)
 					end
 
 					-- If Damage is near catastrophic, cascade the failure
 					if healthEngineNew < cfg.cascadingFailureThreshold then
-						healthEngineNew = healthEngineNew-(0.1 * cfg.cascadingFailureSpeedFactor)
+						healthEngineNew = healthEngineNew - (0.1 * cfg.cascadingFailureSpeedFactor)
 					end
 
 					-- Prevent Engine going to or below zero. Ensures you can reenter a damaged car.
@@ -576,7 +581,7 @@ CreateThread(function()
 				fBrakeForce = GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fBrakeForce')
 				local newFDeformationDamageMult = fDeformationDamageMult ^ cfg.deformationExponent	-- Pull the handling file value closer to 1
 				if cfg.deformationMultiplier ~= -1 then SetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fDeformationDamageMult', newFDeformationDamageMult * cfg.deformationMultiplier) end  -- Multiply by our factor
-				if cfg.weaponsDamageMultiplier ~= -1 then SetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fWeaponDamageMult', cfg.weaponsDamageMultiplier/cfg.damageFactorBody) end -- Set weaponsDamageMultiplier and compensate for damageFactorBody
+				if cfg.weaponsDamageMultiplier ~= -1 then SetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fWeaponDamageMult', cfg.weaponsDamageMultiplier / cfg.damageFactorBody) end -- Set weaponsDamageMultiplier and compensate for damageFactorBody
 
 				--Get the CollisionDamageMultiplier
 				fCollisionDamageMult = GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fCollisionDamageMult')
@@ -617,12 +622,12 @@ CreateThread(function()
 			healthEngineLast = healthEngineNew
 			healthBodyLast = healthBodyNew
 			healthPetrolTankLast = healthPetrolTankNew
-			lastVehicle=vehicle
+			lastVehicle = vehicle
 			if cfg.randomTireBurstInterval ~= 0 and GetEntitySpeed(vehicle) > 10 then tireBurstLottery() end
 		else
 			if pedInSameVehicleLast == true then
 				-- We just got out of the vehicle
-				lastVehicle = GetVehiclePedIsIn(ped, true)
+				lastVehicle = GetVehiclePedIsIn(cache.ped, true)
 				if cfg.deformationMultiplier ~= -1 then SetVehicleHandlingFloat(lastVehicle, 'CHandlingData', 'fDeformationDamageMult', fDeformationDamageMult) end -- Restore deformation multiplier
 				SetVehicleHandlingFloat(lastVehicle, 'CHandlingData', 'fBrakeForce', fBrakeForce)  -- Restore Brake Force multiplier
 				if cfg.weaponsDamageMultiplier ~= -1 then SetVehicleHandlingFloat(lastVehicle, 'CHandlingData', 'fWeaponDamageMult', cfg.weaponsDamageMultiplier) end	-- Since we are out of the vehicle, we should no longer compensate for bodyDamageFactor
