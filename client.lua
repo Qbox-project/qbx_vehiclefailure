@@ -479,7 +479,7 @@ end
 CreateThread(function()
 	while true do
 		Wait(50)
-		if isPedDrivingAVehicle() then
+		if cache.seat == -1 then
 			vehicle = cache.vehicle
 			vehicleClass = GetVehicleClass(vehicle)
 			healthEngineCurrent = GetVehicleEngineHealth(vehicle)
