@@ -7,9 +7,9 @@ repository 'https://github.com/Qbox-project/qbx-vehiclefailure'
 version '1.0.0'
 
 shared_scripts {
-    '@qbx-core/import.lua',
+    '@qbx_core/import.lua',
     '@ox_lib/init.lua',
-    '@qbx-core/shared/locale.lua',
+    '@qbx_core/shared/locale.lua',
     'locales/en.lua',
     'config.lua'
 }
