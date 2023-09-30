@@ -18,8 +18,8 @@ client_script 'client.lua'
 server_script 'server.lua'
 
 modules {
-	'qbx-core:core',
-    'qbx-core:utils'
+	'qbx_core:playerdata',
+    'qbx_core:utils'
 }
 
 lua54 'yes'
