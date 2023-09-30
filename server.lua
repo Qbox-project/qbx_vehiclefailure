@@ -3,21 +3,21 @@ lib.addCommand('fix', {help = 'Repair your vehicle (Admin Only)', restricted = '
     TriggerClientEvent('vehiclemod:client:fixEverything', source)
 end)
 
-QBCore.Functions.CreateUseableItem("repairkit", function(source, item)
+exports.qbx_core:CreateUseableItem("repairkit", function(source, item)
     local player = QBCore.Functions.GetPlayer(source)
 	if player.Functions.GetItemBySlot(item.slot) ~= nil then
         TriggerClientEvent("qb-vehiclefailure:client:RepairVehicle", source)
     end
 end)
 
-QBCore.Functions.CreateUseableItem("cleaningkit", function(source, item)
+exports.qbx_core:CreateUseableItem("cleaningkit", function(source, item)
     local player = QBCore.Functions.GetPlayer(source)
 	if player.Functions.GetItemBySlot(item.slot) ~= nil then
         TriggerClientEvent("qb-vehiclefailure:client:CleanVehicle", source)
     end
 end)
 
-QBCore.Functions.CreateUseableItem("advancedrepairkit", function(source, item)
+exports.qbx_core:CreateUseableItem("advancedrepairkit", function(source, item)
     local player = QBCore.Functions.GetPlayer(source)
 	if player.Functions.GetItemBySlot(item.slot) ~= nil then
         TriggerClientEvent("qb-vehiclefailure:client:RepairVehicleFull", source)
