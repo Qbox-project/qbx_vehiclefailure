@@ -326,7 +326,7 @@ RegisterNetEvent('iens:repaira', function()
 end)
 
 RegisterNetEvent('iens:besked', function()
-	Qexports.qbx_core:Notify(Lang:t("error.roadside_avail"))
+	exports.qbx_core:Notify(Lang:t("error.roadside_avail"))
 end)
 
 RegisterNetEvent('iens:notAllowed', function()
