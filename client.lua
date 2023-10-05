@@ -40,7 +40,7 @@ local function damageRandomComponent()
 	local dmgFctr = math.random() + math.random(0, 2)
 	local randomComponent = DamageComponents[math.random(1, #DamageComponents)]
 	local randomDamage = (math.random() + math.random(0, 1)) * dmgFctr
-	exports['qbx-mechanicjob']:SetVehicleStatus(GetPlate(vehicle), randomComponent, exports['qbx-mechanicjob']:GetVehicleStatus(GetPlate(vehicle), randomComponent) - randomDamage)
+	exports.qbx_mechanicjob:SetVehicleStatus(GetPlate(vehicle), randomComponent, exports.qbx_mechanicjob:GetVehicleStatus(GetPlate(vehicle), randomComponent) - randomDamage)
 end
 
 ---cleans vehicle with animation and progress bar. Consumes a cleaning kit.
@@ -59,7 +59,7 @@ local function cleanVehicle(veh)
 			combat = true
 		}
 	}) then -- if completed
-		QBCore.Functions.Notify(Lang:t("success.cleaned_veh"))
+		exports.qbx_core:Notify(Lang:t("success.cleaned_veh"))
 		SetVehicleDirtLevel(veh, 0.1)
 		SetVehicleUndriveable(veh, false)
 		WashDecalsFromVehicle(veh, 1.0)
@@ -68,7 +68,7 @@ local function cleanVehicle(veh)
 		ClearAllPedProps(cache.ped)
 		ClearPedTasks(cache.ped)
 	else -- if canceled
-		QBCore.Functions.Notify(Lang:t("error.failed_notification"), "error")
+		exports.qbx_core:Notify(Lang:t("error.failed_notification"), "error")
 		ClearAllPedProps(cache.ped)
 		ClearPedTasks(cache.ped)
 	end
@@ -121,7 +121,7 @@ local function repairVehicle(veh, engineHealth, itemName, timeLowerBound, timeUp
 			flag = 16
 		}
 	}) then -- if completed
-		QBCore.Functions.Notify(Lang:t("success.repaired_veh"))
+		exports.qbx_core:Notify(Lang:t("success.repaired_veh"))
 		SetVehicleEngineHealth(veh, engineHealth)
 		SetVehicleEngineOn(veh, true, false)
 		SetVehicleTyreFixed(veh, 0)
@@ -132,7 +132,7 @@ local function repairVehicle(veh, engineHealth, itemName, timeLowerBound, timeUp
 		closeVehicleDoors(veh)
 		TriggerServerEvent('qb-vehiclefailure:removeItem', itemName)
 	else -- if canceled
-		QBCore.Functions.Notify(Lang:t("error.failed_notification"), "error")
+		exports.qbx_core:Notify(Lang:t("error.failed_notification"), "error")
 		closeVehicleDoors(veh)
 	end
 end
@@ -253,13 +253,13 @@ end
 ---@return number? veh
 local function getVehicleToRepair()
 	if cache.vehicle then
-		QBCore.Functions.Notify(Lang:t("error.inside_veh"), "error")
+		exports.qbx_core:Notify(Lang:t("error.inside_veh"), "error")
 		return
 	end
 
 	local veh = lib.getClosestVehicle(GetEntityCoords(cache.ped), 5, false)
 	if not veh then
-		QBCore.Functions.Notify(Lang:t("error.not_near_veh"), "error")
+		exports.qbx_core:Notify(Lang:t("error.not_near_veh"), "error")
 		return
 	end
 
@@ -282,7 +282,7 @@ RegisterNetEvent('qb-vehiclefailure:client:RepairVehicle', function()
 
 	local engineHealth = GetVehicleEngineHealth(veh) --This is to prevent people from "repairing" a vehicle and setting engine health lower than what the vehicles engine health was before repairing.
 	if engineHealth >= 500 then
-		QBCore.Functions.Notify(Lang:t("error.healthy_veh"), "error")
+		exports.qbx_core:Notify(Lang:t("error.healthy_veh"), "error")
 		return
 	end
 
@@ -310,14 +310,14 @@ end)
 
 RegisterNetEvent('iens:repaira', function()
 	if not isPedDrivingAVehicle() then
-		QBCore.Functions.Notify(Lang:t("error.inside_veh_req"))
+		exports.qbx_core:Notify(Lang:t("error.inside_veh_req"))
 		return
 	end
 	vehicle = cache.vehicle
 	SetVehicleDirtLevel(vehicle)
 	SetVehicleUndriveable(vehicle, false)
 	WashDecalsFromVehicle(vehicle, 1.0)
-	QBCore.Functions.Notify(Lang:t("success.repaired_veh"))
+	exports.qbx_core:Notify(Lang:t("success.repaired_veh"))
 	SetVehicleFixed(vehicle)
 	healthBodyLast = 1000.0
 	healthEngineLast = 1000.0
@@ -326,28 +326,28 @@ RegisterNetEvent('iens:repaira', function()
 end)
 
 RegisterNetEvent('iens:besked', function()
-	QBCore.Functions.Notify(Lang:t("error.roadside_avail"))
+	exports.qbx_core:Notify(Lang:t("error.roadside_avail"))
 end)
 
 RegisterNetEvent('iens:notAllowed', function()
-	QBCore.Functions.Notify(Lang:t("error.no_permission"))
+	exports.qbx_core:Notify(Lang:t("error.no_permission"))
 end)
 
 RegisterNetEvent('iens:repair', function()
 	if not isPedDrivingAVehicle() then
-		QBCore.Functions.Notify(Lang:t("error.inside_veh_req"))
+		exports.qbx_core:Notify(Lang:t("error.inside_veh_req"))
 		return
 	end
 	vehicle = cache.vehicle
 	if isNearMechanic() then return end
 	if GetVehicleEngineHealth(vehicle) >= cfg.cascadingFailureThreshold + 5 then
-		QBCore.Functions.Notify(Lang:t(('nofix_message_%s'):format(noFixMessagePos)))
+		exports.qbx_core:Notify(Lang:t(('nofix_message_%s'):format(noFixMessagePos)))
 		noFixMessagePos += 1
 		if noFixMessagePos > repairCfg.noFixMessageCount then noFixMessagePos = 1 end
 		return
 	end
 	if GetVehicleOilLevel(vehicle) <= 0 then
-		QBCore.Functions.Notify(Lang:t("error.veh_damaged"))
+		exports.qbx_core:Notify(Lang:t("error.veh_damaged"))
 		return
 	end
 	
@@ -358,7 +358,7 @@ RegisterNetEvent('iens:repair', function()
 	healthPetrolTankLast = 750.0
 	SetVehicleEngineOn(vehicle, true, false )
 	SetVehicleOilLevel(vehicle, (GetVehicleOilLevel(vehicle) / 3) - 0.5)
-	QBCore.Functions.Notify(Lang:t(('fix_message_%s'):format(fixMessagePos)))
+	exports.qbx_core:Notify(Lang:t(('fix_message_%s'):format(fixMessagePos)))
 	fixMessagePos += 1
 	if fixMessagePos > repairCfg.fixMessageCount then fixMessagePos = 1 end
 end)
