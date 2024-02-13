@@ -40,7 +40,7 @@ local function damageRandomComponent()
 	local dmgFctr = math.random() + math.random(0, 2)
 	local randomComponent = DamageComponents[math.random(1, #DamageComponents)]
 	local randomDamage = (math.random() + math.random(0, 1)) * dmgFctr
-	exports.qbx_mechanicjob:SetVehicleStatus(GetPlate(vehicle), randomComponent, exports.qbx_mechanicjob:GetVehicleStatus(GetPlate(vehicle), randomComponent) - randomDamage)
+	exports.qbx_mechanicjob:SetVehicleStatus(qbx.getVehiclePlate(vehicle), randomComponent, exports.qbx_mechanicjob:GetVehicleStatus(qbx.getVehiclePlate(vehicle), randomComponent) - randomDamage)
 end
 
 ---cleans vehicle with animation and progress bar. Consumes a cleaning kit.
@@ -232,7 +232,7 @@ end
 local function tireBurstLottery()
 	local tireBurstNumber = math.random(tireBurstMaxNumber)
 	if tireBurstNumber ~= tireBurstMaxNumber then return end
-	
+
 	-- We won the lottery, lets burst a tire.
 	if GetVehicleTyresCanBurst(vehicle) == false then return end
 	local numWheels = GetVehicleNumberOfWheels(vehicle)
@@ -350,7 +350,7 @@ RegisterNetEvent('iens:repair', function()
 		exports.qbx_core:Notify(Lang:t("error.veh_damaged"))
 		return
 	end
-	
+
 	SetVehicleUndriveable(vehicle, false)
 	SetVehicleEngineHealth(vehicle, cfg.cascadingFailureThreshold + 5)
 	SetVehiclePetrolTankHealth(vehicle, 750.0)
@@ -409,7 +409,7 @@ local function setVehicleEngineTorqueMultiplier()
 				-- Forward and braking
 				isBrakingForward = true
 				brk = fscale(brake, 127.0, 254.0, 0.01, fBrakeForce, 10.0 - (cfg.sundayDriverBrakeCurve * 2.0))
-				--exports['qb-vehicletuning']:SetVehicleStatus(QBCore.Functions.GetPlate(vehicle), "brakes", exports['qb-vehicletuning']:GetVehicleStatus(QBCore.Functions.GetPlate(vehicle), "brakes") - 0.01)
+				--exports['qb-vehicletuning']:SetVehicleStatus(qbx.getVehiclePlate(vehicle), "brakes", exports['qb-vehicletuning']:GetVehicleStatus(qbx.getVehiclePlate(vehicle), "brakes") - 0.01)
 			end
 		elseif speed <= -1.0 then
 			-- Going reverse
@@ -417,7 +417,7 @@ local function setVehicleEngineTorqueMultiplier()
 				-- Reversing and accelerating (using the brake)
 				local rev = fscale(brake, 127.0, 254.0, 0.1, 1.0, 10.0 - (cfg.sundayDriverAcceleratorCurve * 2.0))
 				factor = factor * rev
-				--exports['qb-vehicletuning']:SetVehicleStatus(QBCore.Functions.GetPlate(vehicle), "brakes", exports['qb-vehicletuning']:GetVehicleStatus(QBCore.Functions.GetPlate(vehicle), "brakes") - 0.01)
+				--exports['qb-vehicletuning']:SetVehicleStatus(qbx.getVehiclePlate(vehicle), "brakes", exports['qb-vehicletuning']:GetVehicleStatus(qbx.getVehiclePlate(vehicle), "brakes") - 0.01)
 			end
 			if accelerator > 127 then
 				-- Reversing and braking (Using the accelerator)
