@@ -5,18 +5,21 @@ description 'qbx_vehiclefailure'
 repository 'https://github.com/Qbox-project/qbx_vehiclefailure'
 version '1.0.0'
 
+ox_lib 'locale'
+
 shared_scripts {
     '@ox_lib/init.lua',
-    '@qbx_core/modules/utils.lua',
-    '@qbx_core/shared/locale.lua',
-    'locales/en.lua',
-    'locales/*.lua',
+    '@qbx_core/modules/lib.lua',
     'config.lua'
 }
 
 client_scripts {
     '@qbx_core/modules/playerdata.lua',
     'client/main.lua',
+}
+
+files {
+    'locales/*.json'
 }
 
 server_script 'server/main.lua'
