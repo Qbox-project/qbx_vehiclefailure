@@ -5,21 +5,21 @@ end)
 
 exports.qbx_core:CreateUseableItem('repairkit', function(source, item)
     local player = exports.qbx_core:GetPlayer(source)
-	if player.Functions.GetItemBySlot(item.slot) ~= nil then
+    if player.Functions.GetItemBySlot(item.slot) ~= nil then
         TriggerClientEvent('qb-vehiclefailure:client:RepairVehicle', source)
     end
 end)
 
 exports.qbx_core:CreateUseableItem('cleaningkit', function(source, item)
     local player = exports.qbx_core:GetPlayer(source)
-	if player.Functions.GetItemBySlot(item.slot) ~= nil then
+    if player.Functions.GetItemBySlot(item.slot) ~= nil then
         TriggerClientEvent('qb-vehiclefailure:client:CleanVehicle', source)
     end
 end)
 
 exports.qbx_core:CreateUseableItem('advancedrepairkit', function(source, item)
     local player = exports.qbx_core:GetPlayer(source)
-	if player.Functions.GetItemBySlot(item.slot) ~= nil then
+    if player.Functions.GetItemBySlot(item.slot) ~= nil then
         TriggerClientEvent('qb-vehiclefailure:client:RepairVehicleFull', source)
     end
 end)
