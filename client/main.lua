@@ -386,6 +386,18 @@ local function preventVehicleFlip()
     end
 end
 
+local function preventAirControl()
+    local veh = GetVehiclePedIsIn(cache.ped, false)
+    if DoesEntityExist(veh) and not IsEntityDead(veh) then
+        local model = GetEntityModel(veh)
+        -- If it's not a boat, plane or helicopter, and the vehicle is off the ground with ALL wheels, then block steering/leaning left/right/up/down.
+        if not IsThisModelABoat(model) and not IsThisModelAHeli(model) and not IsThisModelAPlane(model) and IsEntityInAir(veh) then
+            DisableControlAction(0, 59) -- leaning left/right
+            DisableControlAction(0, 60) -- leaning up/down
+        end
+    end
+end
+
 local function setVehicleEngineTorqueMultiplier()
     local factor = 1.0
     if cfg.torqueMultiplierEnabled and healthEngineNew < 900 then
@@ -470,6 +482,9 @@ if cfg.torqueMultiplierEnabled or cfg.preventVehicleFlip or cfg.limpMode then
             end
             if cfg.preventVehicleFlip then
                 preventVehicleFlip()
+            end
+            if cfg.preventAirControl then
+                preventAirControl()
             end
         end
     end)
