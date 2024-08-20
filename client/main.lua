@@ -387,14 +387,14 @@ local function preventVehicleFlip()
 end
 
 local function preventAirControl()
-    if not cache.vehicle or IsEntityDead(cache.vehicle) then return end
-
-    local model = GetEntityModel(cache.vehicle)
+    local veh = cache.vehicle
+    if not veh or IsEntityDead(veh) then return end
+    local model = GetEntityModel(veh)
     -- If it's not a boat, plane or helicopter, and the vehicle is off the ground with ALL wheels, then block steering/leaning left/right/up/down.
-    if IsThisModelABoat(model) or IsThisModelAHeli(model) or IsThisModelAPlane(model) or not IsEntityInAir(cache.vehicle) then return end
-
-    DisableControlAction(0, 59, true) -- leaning left/right
-    DisableControlAction(0, 60, true) -- leaning up/down
+    if IsThisModelABoat(model) or IsThisModelAHeli(model) or IsThisModelAPlane(model) or not IsEntityInAir(veh) then return end
+    DisableControlAction(0, 59, true)
+    DisableControlAction(0, 61, true) 
+    DisableControlAction(0, 62, true)
 end
 
 local function setVehicleEngineTorqueMultiplier()
