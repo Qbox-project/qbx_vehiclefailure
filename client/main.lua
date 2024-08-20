@@ -387,7 +387,7 @@ local function preventVehicleFlip()
 end
 
 local function preventAirControl()
-    local veh = GetVehiclePedIsIn(cache.ped, false)
+    local veh = GetVehiclePedIsIn(cache.vehicle, false)
     if not (DoesEntityExist(veh) and not IsEntityDead(veh)) then
         local model = GetEntityModel(veh)
         -- If it's not a boat, plane or helicopter, and the vehicle is off the ground with ALL wheels, then block steering/leaning left/right/up/down.
