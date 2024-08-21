@@ -393,7 +393,7 @@ local function preventAirControl()
     -- If it's not a boat, plane or helicopter, and the vehicle is off the ground with ALL wheels, then block steering/leaning left/right/up/down.
     if IsThisModelABoat(model) or IsThisModelAHeli(model) or IsThisModelAPlane(model) or not IsEntityInAir(veh) then return end
     DisableControlAction(0, 59, true)
-    DisableControlAction(0, 61, true) 
+    DisableControlAction(0, 61, true)
     DisableControlAction(0, 62, true)
 end
 
@@ -470,9 +470,9 @@ local function setVehicleEngineTorqueMultiplier()
     SetVehicleEngineTorqueMultiplier(vehicle, factor)
 end
 
-if cfg.torqueMultiplierEnabled or cfg.preventVehicleFlip or cfg.limpMode then
+local function vehicleModThread()
     CreateThread(function()
-        while true do
+        while cache.seat == -1 do
             Wait(0)
             if cfg.torqueMultiplierEnabled or cfg.sundayDriver or cfg.limpMode then
                 if pedInSameVehicleLast then
@@ -486,6 +486,13 @@ if cfg.torqueMultiplierEnabled or cfg.preventVehicleFlip or cfg.limpMode then
                 preventAirControl()
             end
         end
+    end)
+end
+
+if cfg.torqueMultiplierEnabled or cfg.preventVehicleFlip or cfg.limpMode or cfg.preventAirControl then
+    lib.onCache('seat', function(value)
+        if not value or value ~= -1 then return end
+        vehicleModThread()
     end)
 end
 
